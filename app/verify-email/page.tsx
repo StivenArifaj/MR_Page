@@ -63,4 +63,3 @@ export default function VerifyEmailPage() {
         </Suspense>
     )
 }
-now ginow 
