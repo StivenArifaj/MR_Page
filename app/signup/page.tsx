@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,12 +8,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Eye, EyeOff, ArrowLeft, CheckCircle2, GraduationCap, Users, BookOpen } from "lucide-react"
+import { Toaster, toast } from "react-hot-toast"
+import axios from "axios"
 
 export default function SignupPage() {
   const [step, setStep] = useState(0)
   const [userType, setUserType] = useState<"student" | "parent" | "teacher" | "">("")
   const [showPassword, setShowPassword] = useState(false)
 
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [age, setAge] = useState("")
@@ -31,35 +33,34 @@ export default function SignupPage() {
   const handleUserTypeSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (userType) {
-      console.log("[v0] User type selected:", userType)
       setStep(1)
     }
   }
 
   const handleBasicSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] Basic info submitted:", {
-      email,
-      userType,
-      age,
-      grade,
-      childAge,
-      childGrade,
-      schoolName,
-      teachingGrade,
-    })
     setStep(2)
   }
 
-  const handleQuizSubmit = (e: React.FormEvent) => {
+  const handleQuizSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] Quiz submitted:", { q1, q2, q3 })
-    setStep(3)
+    try {
+      await axios.post("/api/auth/signup", {
+        name,
+        email,
+        password,
+      })
+      toast.success("Account created successfully!")
+      setStep(3)
+    } catch (error) {
+      toast.error("Something went wrong.")
+    }
   }
 
   if (step === 3) {
     return (
       <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
+        <Toaster />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20 dark:from-primary/10 dark:via-background dark:to-accent/10" />
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary/30 rounded-full blur-3xl animate-blob" />
         <div className="absolute top-40 right-10 w-72 h-72 bg-accent/30 rounded-full blur-3xl animate-blob animation-delay-2000" />
@@ -85,6 +86,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
+      <Toaster />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20 dark:from-primary/10 dark:via-background dark:to-accent/10" />
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary/30 rounded-full blur-3xl animate-blob" />
       <div className="absolute top-40 right-10 w-72 h-72 bg-accent/30 rounded-full blur-3xl animate-blob animation-delay-2000" />
@@ -143,7 +145,7 @@ export default function SignupPage() {
                         </div>
                         <span className="font-semibold text-base">Student</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">I'm a student learning about finances</p>
+                      <p className="text-sm text-muted-foreground">I&apos;m a student learning about finances</p>
                     </Label>
                   </div>
 
@@ -190,6 +192,18 @@ export default function SignupPage() {
             <>
               <h2 className="text-2xl font-semibold mb-6">Create your account</h2>
               <form onSubmit={handleBasicSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="h-12"
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -261,7 +275,7 @@ export default function SignupPage() {
                 {userType === "parent" && (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="childAge">Child's Age</Label>
+                      <Label htmlFor="childAge">Child&apos;s Age</Label>
                       <Input
                         id="childAge"
                         type="number"
@@ -275,7 +289,7 @@ export default function SignupPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="childGrade">Child's Grade</Label>
+                      <Label htmlFor="childGrade">Child&apos;s Grade</Label>
                       <Input
                         id="childGrade"
                         type="text"
@@ -339,7 +353,7 @@ export default function SignupPage() {
                 {userType === "student" && (
                   <>
                     <div className="space-y-3">
-                      <Label className="text-base font-medium">1. What's your main financial goal?</Label>
+                      <Label className="text-base font-medium">1. What&apos;s your main financial goal?</Label>
                       <RadioGroup value={q1} onValueChange={setQ1} required>
                         <div className="flex items-center space-x-2 border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
                           <RadioGroupItem value="save" id="q1-save" />
@@ -491,7 +505,7 @@ export default function SignupPage() {
                 {userType === "teacher" && (
                   <>
                     <div className="space-y-3">
-                      <Label className="text-base font-medium">1. What's your main teaching goal?</Label>
+                      <Label className="text-base font-medium">1. What&apos;s your main teaching goal?</Label>
                       <RadioGroup value={q1} onValueChange={setQ1} required>
                         <div className="flex items-center space-x-2 border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
                           <RadioGroupItem value="curriculum" id="q1-curriculum" />

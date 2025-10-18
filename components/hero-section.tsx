@@ -42,7 +42,7 @@ export function HeroSection() {
     asChild
   >
     <Link href="/signup">
-      Get started — it's free
+      Get started — it&apos;s free
       <ArrowRight className="ml-2 h-4 w-4" />
     </Link>
   </Button>

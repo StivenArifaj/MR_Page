@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -37,11 +37,14 @@ export const metadata: Metadata = {
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-05-07%20200115-f0cBBQXapdyWQqN1ScUv9GyqqtBj5G.png",
     ],
   },
+    generator: 'v0.app'
+}
+
+export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
   ],
-    generator: 'v0.app'
 }
 
 interface RootLayoutProps {

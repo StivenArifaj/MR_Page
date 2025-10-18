@@ -1,16 +1,20 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Menu, X, Moon, Sun } from "lucide-react"
+import { Menu, X, Moon, Sun, User } from "lucide-react"
 import { useTheme } from "next-themes"
+import { useUser } from "@/hooks/use-user"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const { user, logout } = useUser()
 
   useEffect(() => {
     setMounted(true)
@@ -29,6 +33,11 @@ export function Navigation() {
     { href: "#for-schools", label: "For Schools" },
     { href: "#faq", label: "FAQ" },
   ]
+
+  const getInitials = (name: string) => {
+    const names = name.split(' ')
+    return names.map((n) => n[0]).join('')
+  }
 
   return (
     <nav
@@ -74,12 +83,47 @@ export function Navigation() {
                 <span className="sr-only">Toggle theme</span>
               </Button>
             )}
-            <Button variant="ghost" asChild>
-              <Link href="/login">Log In</Link>
-            </Button>
-            <Button asChild className="bg-primary hover:bg-primary/90">
-              <Link href="/signup">Get Started — Free</Link>
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link href="/login">Log In</Link>
+                </Button>
+                <Button asChild className="bg-primary hover:bg-primary/90">
+                  <Link href="/signup">Get Started — Free</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -117,16 +161,29 @@ export function Navigation() {
                 </Link>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
-                <Button variant="outline" asChild className="w-full bg-transparent">
-                  <Link href="/login" onClick={toggleMenu}>
-                    Log In
-                  </Link>
-                </Button>
-                <Button asChild className="w-full bg-primary hover:bg-primary/90">
-                  <Link href="/signup" onClick={toggleMenu}>
-                    Get Started — Free
-                  </Link>
-                </Button>
+                {user ? (
+                  <>
+                    <Link href="/dashboard">
+                      <Button variant="outline" asChild className="w-full bg-transparent">
+                         Dashboard
+                      </Button>
+                    </Link>
+                    <Button onClick={logout} className="w-full">Log Out</Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild className="w-full bg-transparent">
+                      <Link href="/login" onClick={toggleMenu}>
+                        Log In
+                      </Link>
+                    </Button>
+                    <Button asChild className="w-full bg-primary hover:bg-primary/90">
+                      <Link href="/signup" onClick={toggleMenu}>
+                        Get Started — Free
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
