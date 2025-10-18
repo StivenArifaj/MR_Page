@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcrypt'
 import { createToken } from '@/lib/jwt'
-import { cookies } from 'next/headers'
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
@@ -33,14 +34,16 @@ export async function POST(req: Request) {
 
     const token = createToken({ userId: user.id })
 
-    cookies().set('token', token, {
+    const response = NextResponse.json({ message: 'Login successful' }, { status: 200 });
+
+    response.cookies.set('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24, // 1 day
       path: '/',
     })
 
-    return NextResponse.json({ message: 'Login successful' }, { status: 200 })
+    return response;
 
   } catch (error) {
     console.error('[LOGIN_API]', error)

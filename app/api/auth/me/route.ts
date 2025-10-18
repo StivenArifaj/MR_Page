@@ -2,10 +2,11 @@
 import { NextResponse, NextRequest } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-    const token = cookies().get('token')?.value
+    const token = req.cookies.get('token')?.value
 
   if (!token) {
     return new NextResponse("Unauthorized", { status: 401 });
